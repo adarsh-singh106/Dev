@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db'); // Database import
 const { errorHandler } = require('./middleware/errorMiddleware'); // Error handler import
+const cors = require('cors')
 
 // 1. Config Load karo
 dotenv.config();
@@ -12,6 +13,9 @@ connectDB();
 
 // 3. App Initialize karo (Ye sabse pehle hona chahiye middlewares se)
 const app = express();
+
+// IMP:  Allow Cross-Origin Requests (MUST BE AT THE TOP)
+app.use(cors()); // <--- NEW: This allows your frontend to talk to the backend
 
 // 4. Rate Limiter Setup
 const limiter = rateLimit({

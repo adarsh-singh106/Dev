@@ -13,7 +13,7 @@ const {
 
 // 1. Register Route
 // URL: POST /api/users/
-router.post('/', registerUser);
+router.post('/register', registerUser);
 
 // 2. Login Route
 // URL: POST /api/users/login
