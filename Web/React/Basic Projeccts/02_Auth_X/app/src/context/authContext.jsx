@@ -10,6 +10,9 @@ const initialState = {
   password: "",
   error: "",
   loading: false,
+  // New Verification State
+  verificationStatus: "idle", // 'idle' | 'loading' | 'success' | 'error'
+  verificationMessage: "",
 };
 
 // 2. Reducer Logic
@@ -60,6 +63,28 @@ const authReducer = (state, action) => {
         loading: false,
         error: "",
       };
+    // --- NEW VERIFICATION CASES ---
+    case "VERIFY_START":
+      return {
+        ...state,
+        verificationStatus: "loading",
+        verificationMessage: "Verifying your email...",
+      };
+    case "VERIFY_SUCCESS":
+      return {
+        ...state,
+        verificationStatus: "success",
+        verificationMessage: action.payload,
+      };
+    case "VERIFY_FAIL":
+      return {
+        ...state,
+        verificationStatus: "error",
+        verificationMessage: action.payload,
+      };
+    // 👇 ADD THIS LINE
+    case "VERIFY_RESET":
+      return { ...state, verificationStatus: "idle", verificationMessage: "" };
     default:
       return state;
   }
@@ -108,9 +133,8 @@ export const AuthProvider = ({ children }) => {
 
       const response = await axios.post(url, payload);
 
-      console.log("Success: ", response.data);
-      // OPTIONAL: Save the user/token to LocalStorage so they stay logged in
-      if (response.data) {
+      // ✅ SECURITY FIX: Only save user if it is a LOGIN action
+      if (signState === "SignIn" && response.data.token) {
         localStorage.setItem("user", JSON.stringify(response.data));
       }
       dispatch({ type: "SUBMIT_SUCCESS" });
@@ -133,10 +157,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
   // --- FIX END ---
+  // --- NEW FUNCTION: Verify Email ---
+  const verifyEmail = async (token) => {
+    dispatch({ type: "VERIFY_START" });
+    try {
+      // FIX: Ensure this is Port 3001
+      const response = await axios.post(
+        "http://localhost:3001/api/users/verify",
+        { token }
+      );
+      dispatch({ type: "VERIFY_SUCCESS", payload: response.data.message });
+    } catch (error) {
+      const msg = error.response?.data?.message || "Verification Failed";
+      dispatch({ type: "VERIFY_FAIL", payload: msg });
+    }
+  };
 
   // Return must happen at the end of the Component function
   return (
-    <AuthContext.Provider value={{ state, dispatch, submitForm }}>
+    <AuthContext.Provider value={{ state, dispatch, submitForm, verifyEmail }}>
       {children}
     </AuthContext.Provider>
   );

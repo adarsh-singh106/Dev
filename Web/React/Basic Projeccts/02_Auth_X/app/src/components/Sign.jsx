@@ -3,11 +3,11 @@ import { useAuth } from "../context/authContext";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const Sign = () => {
-  // Extract everything we need from Context
   const { state, dispatch, submitForm } = useAuth();
-  const location = useLocation(); // Gets current URL info
-  const navigate = useNavigate(); // Hook to change URL
-  // Sync URL with Context State
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // 1. Sync URL with Context State (Keep this)
   useEffect(() => {
     if (location.pathname === "/login") {
       dispatch({ type: "SWITCH_MODE", payload: "SignIn" });
@@ -16,16 +16,24 @@ const Sign = () => {
     }
   }, [location.pathname, dispatch]);
 
-  // Watch for successful login and redirect
+  // 2. Watch for successful login and redirect (THE SAFE VERSION)
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    // If user is found and loading is finished -> Go to Dashboard
-    if (user && !state.loading) {
-      navigate("/dashboard");
+    const userString = localStorage.getItem("user");
+
+    // Check if user exists AND we are done loading
+    if (userString && !state.loading) {
+      const user = JSON.parse(userString);
+
+      // 🛑 SAFETY CHECK: Only redirect if they have a TOKEN
+      // This prevents the infinite loop bug
+      if (user.token) {
+        navigate("/dashboard");
+      }
     }
   }, [state.loading, navigate]);
 
-  // Destructure state for cleaner JSX
+  // ❌ DELETED THE DUPLICATE/UNSAFE useEffect HERE ❌
+
   const { signState, firstName, lastName, email, password, error, loading } =
     state;
   return (

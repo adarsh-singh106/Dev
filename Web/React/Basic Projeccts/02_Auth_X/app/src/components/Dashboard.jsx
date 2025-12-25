@@ -16,7 +16,7 @@ const Dashboard = () => {
       // 3. If user exists, save to state so we can display it
       setUser(JSON.parse(userData));
     }
-  }, [navigate]);
+  }, []);
 
   const handleLogout = () => {
     // 1. Clear the storage
