@@ -3,8 +3,7 @@ import { authReducer } from "./authReducer";
 
 const initialState = {
   signState: "SignUp",
-  firstName: "",
-  lastName: "",
+  name:"",
   userName: "",
   email: "",
   password: "",

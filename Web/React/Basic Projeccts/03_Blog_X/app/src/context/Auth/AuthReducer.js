@@ -6,6 +6,12 @@ export const authReducer = (state, action) => {
         signState: state.signState === "SignUp" ? "SignIn" : "SignUp",
         error: "",
       };
+    case "SWITCH_MODE":
+      return {
+        ...state,
+        signState:action.payload,
+        error:''
+      }
     case "SET_FIELD":
       return {
         ...state,

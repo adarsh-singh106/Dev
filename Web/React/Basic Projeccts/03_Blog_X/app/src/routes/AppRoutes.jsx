@@ -1,16 +1,38 @@
-import React from 'react'
-import {Routes,Route} from 'react-router-dom'
-import LandingPage from '../pages/LandingPage/LandingPage'
-import Sign from '../components/Sign'
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+
+// Layouts
+import MainLayout from '../layouts/MainLayout';
+import AuthLayout from '../layouts/AuthLayout';
+
+// Pages
+import LandingPage from '../pages/LandingPage/LandingPage'; // Your Hero/Landing page
+import AuthPage from '../pages/AuthPage/AuthPage';       // The Login/Signup Component we made
+// import Profile from '../pages/Profile';      // Example page
+// import Feed from '../pages/Feed';            // Example page
 
 const AppRoutes = () => {
   return (
     <Routes>
-        <Route path='/' element={<LandingPage/>} />
-        <Route path='/register' element={<Sign/>}/>
-        <Route path='/login' element={<Sign/>}/>
-    </Routes>
-  )
-}
+      {/* GROUP 1: Public Pages (With Navbar) */}
+      {/* Any route inside here automatically gets the Navbar */}
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/explore" element={<div>Explore Page</div>} />
+        {/* <Route path="/profile" element={<Profile />} /> */}
+      </Route>
 
-export default AppRoutes
+      {/* GROUP 2: Authentication Pages (No Navbar) */}
+      {/* Any route inside here acts as a standalone page */}
+      <Route element={<AuthLayout />}>
+        <Route path="/login" element={<AuthPage />} />
+        <Route path="/register" element={<AuthPage />} />
+      </Route>
+
+      {/* Catch-all: Redirect 404s to Home */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+};
+
+export default AppRoutes;
