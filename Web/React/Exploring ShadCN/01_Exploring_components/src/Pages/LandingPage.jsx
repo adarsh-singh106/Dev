@@ -4,7 +4,7 @@ import AuthModal from "@/components/AuthModal";
 
 const LandingPage = () => {
   const [showAuth, setShowAuth] = useState(false);
-
+  
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground p-4 text-center">
       <div className="max-w-3xl space-y-6 animate-in fade-in zoom-in duration-500">

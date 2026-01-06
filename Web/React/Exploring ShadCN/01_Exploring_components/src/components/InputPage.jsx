@@ -13,9 +13,9 @@ import { Button } from "@/components/ui/button";
 import supabase from "@/db/supabase";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-const InputPage = ({ taskToEdit, setEditingTask,session }) => {
+const InputPage = ({ taskToEdit, setEditingTask, session }) => {
   const queryClient = useQueryClient();
-  
+
   const [task, setTask] = useState({
     title: "",
     description: "",
@@ -51,32 +51,34 @@ const InputPage = ({ taskToEdit, setEditingTask,session }) => {
         if (error) throw error;
       } else {
         // CREATE OPERATION
-        const { error } = await supabase
-          .from("tasks")
-          .insert(newTaskData);
+        const { error } = await supabase.from("tasks").insert({
+          ...newTaskData,
+          // This is the key. We stamp the task with the user's ID.
+          user_id: session.user.id,
+        });
         if (error) throw error;
       }
     },
     onSuccess: () => {
       // Refresh the table automatically
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      
+
       // Clear Form & Exit Edit Mode
       setTask({ title: "", description: "" });
-      setEditingTask(null); 
+      setEditingTask(null);
     },
     onError: (error) => {
       alert("Error: " + error.message);
-    }
+    },
   });
 
   const onSubmitHandler = () => {
     if (!task.title || !task.description) return alert("Fill all fields");
-    
+
     // Trigger the mutation
-    mutation.mutate({ 
-        title: task.title, 
-        description: task.description 
+    mutation.mutate({
+      title: task.title,
+      description: task.description,
     });
   };
 
@@ -116,19 +118,25 @@ const InputPage = ({ taskToEdit, setEditingTask,session }) => {
         <CardFooter className="gap-2 flex items-center">
           {/* CANCEL BUTTON: Only shows when editing */}
           {taskToEdit && (
-            <Button variant="outline" className=" flex-1" onClick={handleCancel}>
+            <Button
+              variant="outline"
+              className=" flex-1"
+              onClick={handleCancel}
+            >
               Cancel
             </Button>
           )}
 
-          <Button 
-            onClick={onSubmitHandler} 
+          <Button
+            onClick={onSubmitHandler}
             className=" flex-1"
             disabled={mutation.isPending}
           >
-            {mutation.isPending 
-               ? "Saving..." 
-               : (taskToEdit ? "Update Task" : "Add Task")}
+            {mutation.isPending
+              ? "Saving..."
+              : taskToEdit
+              ? "Update Task"
+              : "Add Task"}
           </Button>
         </CardFooter>
       </Card>
