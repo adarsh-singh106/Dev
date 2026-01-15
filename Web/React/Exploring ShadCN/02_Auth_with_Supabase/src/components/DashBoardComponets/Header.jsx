@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import ProfileDropDown from "./ProfileDropDown";
-const Component01 = () => {
+const Header = () => {
   
   return (
-    <div className="w-70">
-      <div  className="flex justify-between px-3 py-2 border-2 rounded-lg bg-gray-300 ">
-        <div className="text-xl font-bold">Add Mittr!</div>
+ 
+      <div  className="flex w-93 my-3 justify-between items-center p-2 border-2 rounded-lg  bg-gray-300 ">
+        <div className="text-2xl font-bold">Add Mittr!</div>
         <ProfileDropDown/>
       </div>
-    </div>
   );
 };
 
-export default Component01;
+export default Header;

@@ -13,8 +13,8 @@ const ProfileDropDown = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="overflow-hidden">
-        <Avatar className="h-8 w-8 rounded-lg">
-          <AvatarImage src="https://github.com/shadcn.png" />
+        <Avatar className="h-10 w-10 rounded-lg">
+          <AvatarImage  src="https://github.com/shadcn.png" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
