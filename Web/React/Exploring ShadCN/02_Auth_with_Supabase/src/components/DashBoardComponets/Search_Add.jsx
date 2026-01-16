@@ -7,7 +7,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 // 1. Remove 'Link' (we don't need it)
-// 2. Import your Modal
+// 2. Import your Modal.
 import { FriendModal } from "@/components/DashBoardComponets/FriendModal";
 
 const Search_Add = ({ onAdd }) => {
