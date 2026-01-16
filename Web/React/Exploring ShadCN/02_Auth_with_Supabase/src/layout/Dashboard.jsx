@@ -3,6 +3,7 @@ import EmptyList from "@/components/DashBoardComponets/EmptyList";
 import Header from "@/components/DashBoardComponets/Header";
 import Search_Add from "@/components/DashBoardComponets/Search_Add";
 import React, { useState } from "react";
+import { Toaster } from "@/components/ui/sonner";
 
 const Dashboard = () => {
   // 1. State: Stores list of friends
@@ -11,9 +12,9 @@ const Dashboard = () => {
   // 2. Create Function
   const handleAddFriend = (newFriend) => {
     const friendWithId = { ...newFriend, id: Date.now() };
-    
+
     // FIX 1: Wrap in brackets [] to keep it an Array!
-    setFriends([...friends, friendWithId]); 
+    setFriends([...friends, friendWithId]);
   };
 
   // 3. Edit Function
@@ -23,8 +24,8 @@ const Dashboard = () => {
         // FIX 2: Use === for comparison, not =
         currFriend.id === updateFriend.id
           ? { ...currFriend, ...updateFriend }
-          : currFriend
-      )
+          : currFriend,
+      ),
     );
   };
 
@@ -37,10 +38,10 @@ const Dashboard = () => {
     <div className="flex flex-col items-center min-h-screen">
       <Header />
       {/* Pass the "Add" function to the Search bar */}
-             <Search_Add onAddFriend={handleAddFriend} />
+      <Search_Add onAdd={handleAddFriend} />
       {/* FIX 3: Correct spelling is .length (lowercase) */}
       {friends.length === 0 ? (
-        <EmptyList /> // Removed undefined 'no_of_data' variable
+        <EmptyList onAdd={handleAddFriend} /> // Removed undefined 'no_of_data' variable
       ) : (
         <DashPage
           friendsList={friends}
@@ -49,6 +50,7 @@ const Dashboard = () => {
           onDelete={handleDeleteFriend}
         />
       )}
+      <Toaster />
     </div>
   );
 };

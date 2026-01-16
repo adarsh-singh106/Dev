@@ -31,7 +31,8 @@ import {
 import { friendSchema } from "@/lib/schemas";
 import { CustomInput } from "@/components/DashBoardComponets/CustomForm";
 
-export function FriendModal({ trigger, data, onSubmit }) {
+import { toast } from "@/components/ui/sonner";
+export function FriendModal({ trigger, data, onSubmit = ()=>{} }) {
   const [open, setOpen] = useState(false);
   const isEditMode = !!data;
 
@@ -58,7 +59,7 @@ export function FriendModal({ trigger, data, onSubmit }) {
           status: "Single",
           mobile: "",
           nickname: "",
-        }
+        },
       );
   }, [data, open, form]);
 
@@ -66,7 +67,16 @@ export function FriendModal({ trigger, data, onSubmit }) {
     // Logic: Default nickname to name if empty
     const finalData = { ...values, nickname: values.nickname || values.name };
     onSubmit(finalData);
+    toast.success(
+      isEditMode ? "Friend updated successfully" : "Friend added successfully",
+    );
     setOpen(false);
+  };
+
+  // For Showing errors in the form
+  const onFormError = (errors) => {
+    toast.error("Please check the form for errors.");
+    console.log(errors.message);
   };
 
   return (
@@ -87,7 +97,7 @@ export function FriendModal({ trigger, data, onSubmit }) {
 
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(onFormSubmit)}
+            onSubmit={form.handleSubmit(onFormSubmit, onFormError)}
             className="space-y-4"
           >
             {/* Row 1 */}
@@ -96,7 +106,7 @@ export function FriendModal({ trigger, data, onSubmit }) {
                 control={form.control}
                 name="name"
                 label="Name"
-                placeholder="John Doe"
+                placeholder="Ash Ketchum"
               />
               <CustomInput
                 control={form.control}

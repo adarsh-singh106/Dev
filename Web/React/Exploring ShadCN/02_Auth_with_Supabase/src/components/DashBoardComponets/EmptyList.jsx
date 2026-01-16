@@ -9,8 +9,9 @@ import {
 } from "@/components/ui/empty";
 import { Contact } from "lucide-react";
 import { Button } from "../ui/button";
+import { FriendModal } from "./FriendModal";
 
-const EmptyList = () => {
+const EmptyList = ({onAdd,}) => {
   return (
  
     <Empty>
@@ -22,7 +23,11 @@ const EmptyList = () => {
         <EmptyDescription>No Contacts found</EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <Button>Add New</Button>
+        <FriendModal 
+        onSubmit={onAdd}
+        trigger={<Button>Add New</Button>}
+        
+        />
       </EmptyContent>
     </Empty>
   );

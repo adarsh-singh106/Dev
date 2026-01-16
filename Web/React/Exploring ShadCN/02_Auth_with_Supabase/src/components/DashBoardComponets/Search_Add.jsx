@@ -10,7 +10,7 @@ import {
 // 2. Import your Modal
 import { FriendModal } from "@/components/DashBoardComponets/FriendModal";
 
-const Search_Add = ({ onAddFriend }) => {
+const Search_Add = ({ onAdd }) => {
   return (
     <div className="flex justify-between gap-2 items-center">
       {/* Search Input Section (Kept exactly the same) */}
@@ -26,16 +26,16 @@ const Search_Add = ({ onAddFriend }) => {
 
       {/* 3. The Modal Implementation */}
       <div className="hover:opacity-80 transition-opacity">
-      <FriendModal
-        // A. We pass the function we received from Dashboard -> DashPage -> Here
-        onSubmit={onAddFriend}
-        // B. We define what the button looks like
-        trigger={
-          <button >
-            <SquarePlus className="h-10 w-10" />
-          </button>
-        }
-      />
+        <FriendModal
+          // A. We pass the function we received from Dashboard -> DashPage -> Here
+          onSubmit={onAdd}
+          // B. We define what the button looks like
+          trigger={
+            <button>
+              <SquarePlus className="h-10 w-10" />
+            </button>
+          }
+        />
       </div>
     </div>
   );
