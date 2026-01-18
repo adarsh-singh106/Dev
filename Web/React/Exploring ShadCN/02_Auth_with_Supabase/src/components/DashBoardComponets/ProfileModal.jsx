@@ -4,6 +4,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -86,6 +87,7 @@ const ProfileModal = ({ open, onOpenChange }) => {
         data: {
           full_name: formData.full_name,
           avatar_url: formData.avatar_url,
+          bio: formData.bio,
         },
       });
 
@@ -106,6 +108,9 @@ const ProfileModal = ({ open, onOpenChange }) => {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
+          <DialogDescription>
+            Make changes to your profile here. Click save when you're done.
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="flex flex-col items-center gap-2">
@@ -145,9 +150,12 @@ const ProfileModal = ({ open, onOpenChange }) => {
                     const { data } = supabase.storage
                       .from("avatars")
                       .getPublicUrl(filePath);
+
+                    console.log("Uploaded Avatar URL:", data.publicUrl); // Debug log
+
                     setFormData((prev) => ({
                       ...prev,
-                      avatar_url: data.publicUrl,
+                      avatar_url: `${data.publicUrl}?t=${new Date().getTime()}`, // Cache buster
                     }));
                     toast.success("Image uploaded!");
                   } catch (error) {

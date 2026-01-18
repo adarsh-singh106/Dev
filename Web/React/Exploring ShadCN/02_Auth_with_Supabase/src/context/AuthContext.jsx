@@ -13,6 +13,7 @@ export const AuthProvider = ({ children }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (session?.user) syncUserProfile(session.user);
       setLoading(false);
     });
 
@@ -22,11 +23,32 @@ export const AuthProvider = ({ children }) => {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (session?.user) syncUserProfile(session.user);
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const syncUserProfile = async (currentUser) => {
+    try {
+      const { id, email, user_metadata } = currentUser;
+      const { full_name, avatar_url, bio } = user_metadata || {};
+
+      const updates = {
+        id,
+        email,
+        full_name: full_name || email?.split("@")[0], // Fallback name
+        avatar_url,
+        bio,
+      };
+
+      const { error } = await supabase.from("profiles").upsert(updates);
+      if (error) console.error("Error syncing profile:", error);
+    } catch (err) {
+      console.error("Unexpected error syncing profile:", err);
+    }
+  };
 
   const signUp = async (email, password, fullName) => {
     // We can pass metadata like full_name to be stored in auth.users
