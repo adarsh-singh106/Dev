@@ -10,12 +10,15 @@ import {
 // 2. Import your Modal.
 import { FriendModal } from "@/components/DashBoardComponets/FriendModal";
 
-const Search_Add = ({ onAdd }) => {
+const Search_Add = ({ onAdd, onSearch }) => {
   return (
     <div className="flex justify-between gap-2 items-center">
-      {/* Search Input Section (Kept exactly the same) */}
+      {/* Search Input Section */}
       <InputGroup className="w-78 h-10 mb-2 border-3 border-black">
-        <InputGroupInput placeholder="Search..." />
+        <InputGroupInput
+          placeholder="Search..."
+          onChange={(e) => onSearch?.(e.target.value)}
+        />
         <InputGroupAddon>
           <SearchIcon />
         </InputGroupAddon>

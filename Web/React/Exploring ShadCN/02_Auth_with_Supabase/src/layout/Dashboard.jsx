@@ -2,55 +2,142 @@ import DashPage from "@/components/DashBoardComponets/DashPage";
 import EmptyList from "@/components/DashBoardComponets/EmptyList";
 import Header from "@/components/DashBoardComponets/Header";
 import Search_Add from "@/components/DashBoardComponets/Search_Add";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import useAuth from "@/hooks/useAuth";
+import supabase from "@/lib/supabase";
+import { toast } from "sonner";
 
 const Dashboard = () => {
-  // 1. State: Stores list of friends
+  const { user } = useAuth();
   const [friends, setFriends] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // 1. Fetch Function
+  useEffect(() => {
+    if (user) {
+      fetchFriends();
+    }
+  }, [user]);
+
+  const fetchFriends = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("friends")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setFriends(data);
+    } catch (error) {
+      toast.error("Error fetching friends: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // 2. Create Function
-  const handleAddFriend = (newFriend) => {
-    const friendWithId = { ...newFriend, id: Date.now() };
+  const handleAddFriend = async (newFriend) => {
+    console.log("Adding friend for user:", user?.id);
+    console.log("New Friend Data:", newFriend);
+    try {
+      if (!user?.id) {
+        throw new Error("User ID is missing. Cannot add friend.");
+      }
+      const { data, error } = await supabase
+        .from("friends")
+        .insert([{ ...newFriend, user_id: user.id }])
+        .select();
 
-    // FIX 1: Wrap in brackets [] to keep it an Array!
-    setFriends([...friends, friendWithId]);
+      if (error) throw error;
+
+      // Update state with the new friend from DB (which has the real ID)
+      setFriends([data[0], ...friends]); // Prepend to list
+    } catch (error) {
+      console.error("Error adding friend:", error);
+      toast.error("Error adding friend: " + error.message);
+    }
   };
 
   // 3. Edit Function
-  const handleUpdateFriend = (updateFriend) => {
-    setFriends(
-      friends.map((currFriend) =>
-        // FIX 2: Use === for comparison, not =
-        currFriend.id === updateFriend.id
-          ? { ...currFriend, ...updateFriend }
-          : currFriend,
-      ),
-    );
+  const handleUpdateFriend = async (updateFriend) => {
+    try {
+      const { error } = await supabase
+        .from("friends")
+        .update(updateFriend)
+        .eq("id", updateFriend.id);
+
+      if (error) throw error;
+
+      // Optimistic UI Update or just update local state
+      setFriends(
+        friends.map((currFriend) =>
+          currFriend.id === updateFriend.id
+            ? { ...currFriend, ...updateFriend }
+            : currFriend,
+        ),
+      );
+    } catch (error) {
+      toast.error("Error updating friend: " + error.message);
+    }
   };
 
   // 4. Delete Function
-  const handleDeleteFriend = (id) => {
-    setFriends(friends.filter((f) => f.id !== id));
+  const handleDeleteFriend = async (id) => {
+    try {
+      const { error } = await supabase.from("friends").delete().eq("id", id);
+
+      if (error) throw error;
+
+      setFriends(friends.filter((f) => f.id !== id));
+      toast.success("Friend deleted");
+    } catch (error) {
+      toast.error("Error deleting friend: " + error.message);
+    }
   };
+
+  // State for Search and Favorites
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showFavorites, setShowFavorites] = useState(false);
+
+  // Filter Logic
+  const filteredFriends = friends.filter((friend) => {
+    const matchesSearch = friend.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesFav = showFavorites ? friend.is_favorite : true;
+    return matchesSearch && matchesFav;
+  });
 
   return (
     <div className="flex flex-col items-center min-h-screen">
-      <Header />
-      {/* Pass the "Add" function to the Search bar */}
-      <Search_Add onAdd={handleAddFriend} />
-      {/* FIX 3: Correct spelling is .length (lowercase) */}
-      {friends.length === 0 ? (
-        <EmptyList onAdd={handleAddFriend} /> // Removed undefined 'no_of_data' variable
+      <Header
+        showFavorites={showFavorites}
+        setShowFavorites={setShowFavorites}
+      />
+      <Search_Add onAdd={handleAddFriend} onSearch={setSearchTerm} />
+
+      {loading ? (
+        <div className="mt-10">Loading friends...</div>
+      ) : filteredFriends.length === 0 && !loading ? (
+        <div className="mt-10 text-gray-500">
+          {friends.length === 0 ? (
+            <EmptyList onAdd={handleAddFriend} />
+          ) : (
+            "No results found."
+          )}
+        </div>
       ) : (
         <DashPage
-          friendsList={friends}
+          friendsList={filteredFriends}
           onAdd={handleAddFriend}
           onEdit={handleUpdateFriend}
           onDelete={handleDeleteFriend}
         />
       )}
-      <Toaster />
+      {/* Toaster is now global in AppRoutes */}
     </div>
   );
 };
