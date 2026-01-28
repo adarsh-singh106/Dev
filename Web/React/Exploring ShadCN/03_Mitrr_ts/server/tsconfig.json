@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    /* Basics */
+    "target": "es2020",             // Modern JS features
+    "module": "commonjs",           // Standard for Node.js
+    "moduleResolution": "node",
+    
+    /* Folders */
+    "rootDir": "./src",             // Where your code lives
+    "outDir": "./dist",             // Where the build goes
+    
+    /* Strictness (The "Professional" part) */
+    "strict": true,                 // Catch bugs early
+    "esModuleInterop": true,        // Allows "import express from 'express'"
+    "forceConsistentCasingInFileNames": true, // Important for Windows
+    "skipLibCheck": true            // Speeds up compilation
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
