@@ -1,0 +1,36 @@
+{
+  "name": "your-api",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Professional Node.js API with TypeScript",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "rimraf dist && tsc && tsc-alias",
+    "start": "node dist/server.js",
+    "lint": "eslint src/**",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^5.2.1",
+    "helmet": "^7.2.0",
+    "mongoose": "^9.2.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/helmet": "^0.0.48",
+    "@types/node": "^22.19.11",
+    "eslint": "^9.39.2",
+    "prettier": "^3.8.1",
+    "rimraf": "^5.0.10",
+    "tsc-alias": "^1.8.16",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
