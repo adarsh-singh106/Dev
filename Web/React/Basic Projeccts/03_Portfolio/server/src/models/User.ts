@@ -1,5 +1,6 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 import bcrypt from "bcryptjs";
+import jwt from 'jsonwebtoken';
 
 // ================================================================
 // 1. THE INTERFACE (Compile-Time Only)
@@ -14,6 +15,7 @@ export interface IUser extends Document {
     createdAt: Date;
     
     // Method Definition: Tells TS that this function exists on every User document
+    getSignedJwtToken: () => string;
     matchpassword: (enteredPassword: string) => Promise<boolean>;
 }
 
@@ -80,6 +82,22 @@ UserSchema.pre('save', async function (this: IUser) {
 UserSchema.methods.matchpassword = async function (enteredPassword: string): Promise<boolean> {
     // 'this.password' refers to the hashed password stored in the DB
     return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// C. Instance Method to Genrate JWT Token
+UserSchema.methods.getSignedJwtToken = function (): string {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+        throw new Error("JWT_SECRET is not defined in .env file");
+    }
+
+    return jwt.sign(
+        { id: this._id },
+        secret,
+        {
+            expiresIn: process.env.JWT_EXPIRE || '30d',
+        } as jwt.SignOptions
+    );
 };
 
 export default mongoose.model<IUser>('User', UserSchema);
