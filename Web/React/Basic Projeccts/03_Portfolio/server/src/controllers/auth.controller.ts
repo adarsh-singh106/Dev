@@ -1,22 +1,35 @@
 import { Request, Response } from "express";
 import authService from "../services/auth.service.js"; // Changed to relative path for safety
+import { IUser } from "@/models/User.js";
+
+// Helper Function to send Tokenised Response
+const sendTokenResponse = (user:IUser , statusCode:number , res:Response) => {
+    // 1. get signed toke for user -> 'user'
+    const token = user.getSignedJwtToken();
+
+    // 2. Send response with the token
+    res.status(statusCode).json(
+        {
+            success:true,
+            token, // send signed token
+            data:{
+                _id:user._id,
+                name:user.name,
+                email:user.email,
+                role:user.role,
+            }
+        }
+    )
+}
+
 
 export const register = async (req: Request, res: Response) => {
     try {
         // 1. Try registering
         const user = await authService.register(req.body);
-
+        
         // 2. Send success response (201 Created)
-        res.status(201).json({
-            success: true,
-            data: {
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                token: "TODO_JWT_TOKEN" // Placeholder for now
-            }
-        });
+        sendTokenResponse(user,201,res);
 
     } catch (error) {
         // 3. Handle Errors (400 Bad Request)
@@ -33,16 +46,8 @@ export const login = async (req: Request, res: Response) => {
         const user = await authService.login(req.body);
 
         // 2. Send success response (200 OK)
-        res.status(200).json({
-            success: true,
-            data: {
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                token: "TODO_JWT_TOKEN"
-            }
-        });
+        sendTokenResponse(user,200,res);
+
 
     } catch (error) {
         // 3. Handle Errors (401 Unauthorized)
